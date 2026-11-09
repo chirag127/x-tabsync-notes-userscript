@@ -32,7 +32,9 @@ the concepts below.
 | `yt-hotkey-prev-userscript` | scripts/yt-hotkey-prev-userscript.md | Key `p`, v1.0.4 |
 | `yt-hotkeys-userscript` | scripts/yt-hotkeys-userscript.md | Six rebindable keys, v1.0.0 |
 | `yt-multiselect-userscript` | scripts/yt-multiselect-userscript.md | InnerTube API, v2.3.0 |
+| `yt-highest-quality-userscript` | scripts/yt-highest-quality-userscript.md | Quality range + persisted preference, v1.0.0 |
 | `greasyfork-plus-userscript` | scripts/greasyfork-plus-userscript.md | Read-only enhancer, v1.0.0 |
+| `x-tabsync-notes-userscript` | [scripts/x-tabsync-notes-userscript.md](scripts/x-tabsync-notes-userscript.md) | Cross-tab notes, ScriptCat APIs, v1.1.0 |
 | `tiktok-compression-bypass-userscript` | scripts/tiktok-compression-bypass-userscript.md | Highest-bitrate swap, v1.0.0 |
 | `tiktok-seek-controls-userscript` | scripts/tiktok-seek-controls-userscript.md | Keys + speed, v1.0.0 |
 | `tiktok-live-chat-userscript` | scripts/tiktok-live-chat-userscript.md | Chat log + export, v1.0.0 |
