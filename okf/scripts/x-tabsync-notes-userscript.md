@@ -4,7 +4,7 @@ title: TabSync Notes
 description: Cross-tab scratch notes and clipboard sharing for ScriptCat. Save the current page or selection from any tab and watch it appear live in every other open tab through GM_addValueChangeListener.
 repo: https://github.com/chirag127/x-tabsync-notes-userscript
 install: https://github.com/chirag127/x-tabsync-notes-userscript/raw/main/x-tabsync-notes.user.js
-version: "1.0.0"
+version: "1.2.1"
 tags: [userscript, scriptcat, cross-tab, clipboard, gm-api]
 timestamp: 2026-11-08T00:00:00Z
 ---
@@ -45,6 +45,10 @@ than allowed to break the whole panel.
   `innerHTML` path here would be a self-XSS waiting to happen.
 - One stylesheet, injected lazily, every class prefixed `tsn-`.
 - Alt+Shift+N toggles the panel and never fires while typing.
+- The header is a **drag handle**, and the position is remembered as a viewport
+  fraction so it reopens sensibly at any window size. A panel you cannot move is
+  a panel you eventually stop opening — the default top-right corner covers the
+  sidebar on GitHub and the recommendations on a video page.
 
 ## ScriptCat-specific surface used
 

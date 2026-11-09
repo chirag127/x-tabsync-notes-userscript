@@ -20,6 +20,7 @@ First read the shared **[userscript install guide](https://github.com/chirag127/
 | Copy everything | **Copy all** in the panel footer |
 | Export as JSON | **Export JSON** (copies to clipboard) |
 | Pin / delete | **Pin**, **Delete** on the note card |
+| Move the panel | Drag its header — the position is remembered across tabs and reloads |
 
 Notes sync **live across tabs**: save one in a tab and it appears in every other tab that has the panel open, with a system notification when a note arrives from elsewhere. The tab you acted in never notifies itself.
 

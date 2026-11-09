@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TabSync Notes
 // @namespace    https://github.com/chirag127
-// @version      1.1.0
+// @version      1.2.1
 // @description  Cross-tab scratch notes and clipboard sharing. Save the current page or selected text as a note from any tab, and see it appear live in every other open tab through ScriptCat's cross-tab storage events. Copy, pin, delete, export. Lives in the ScriptCat menu, shows a panel on demand, and never touches the page when idle.
 // @author       chirag127
 // @license      MIT
@@ -101,6 +101,9 @@
     // Copy a note's text to the clipboard when it is captured. Saves a step for
     // the common "grab this, paste it over there" flow.
     copyOnCapture: false,
+    // Last panel position as {left, top} fractions of the viewport, so the panel
+    // reopens where the user dragged it on any screen size. Null means default.
+    panelPos: null,
   };
 
   // ── Storage layer ───────────────────────────────────────────────────────────
@@ -370,7 +373,9 @@
       #${PANEL_ID} .tsn-head {
         display: flex; align-items: center; gap: 8px;
         padding: 10px 12px; border-bottom: 1px solid #2d2d33; background: #202024;
+        cursor: grab; touch-action: none; user-select: none;
       }
+      #${PANEL_ID} .tsn-head.tsn-dragging { cursor: grabbing; }
       #${PANEL_ID} .tsn-title { font-weight: 600; font-size: 13px; letter-spacing: .2px; flex: 1; }
       #${PANEL_ID} .tsn-count {
         font-size: 11px; color: #9a9aa4; background: #2a2a30;
@@ -602,8 +607,112 @@
     panel.appendChild(foot);
 
     document.documentElement.appendChild(panel);
+    makeDraggable(head);
+    applyPosition();
     renderPanel();
     return panel;
+  }
+
+  // ── Dragging ───────────────────────────────────────────────────────────────
+  //
+  // The panel is fixed at the top right by default, which lands directly on top
+  // of the sidebar of sites like GitHub or a video page's recommendations. A
+  // panel you cannot move is a panel you eventually stop opening, so the header
+  // is a drag handle and the position is remembered.
+
+  /**
+   * Clamp so the panel can never be dragged out of reach. Keeping at least the
+   * width of the header visible means it can always be grabbed again — losing
+   * a floating panel off-screen with no way back is the worst outcome here.
+   */
+  function clampPosition(left, top) {
+    const width = panel ? panel.offsetWidth : 420;
+    const height = panel ? panel.offsetHeight : 200;
+    const margin = 8;
+
+    // The whole panel must stay on screen, not just its header. Clamping only the
+    // header let a tall panel hang off the bottom edge, hiding the note list and
+    // the footer buttons. When the panel is taller than the viewport, the best
+    // that can be done is to pin its top edge and let it scroll internally.
+    const maxLeft = Math.max(margin, window.innerWidth - width - margin);
+    const maxTop = Math.max(margin, window.innerHeight - height - margin);
+    return {
+      left: Math.min(Math.max(margin, left), maxLeft),
+      top: Math.min(Math.max(margin, top), maxTop),
+    };
+  }
+
+  function applyPosition() {
+    if (!panel) return;
+    const saved = store.settings().panelPos;
+    if (!saved || typeof saved.left !== "number" || typeof saved.top !== "number") return;
+    // Stored as viewport fractions so a smaller window still gets a sane spot.
+    const left = saved.left * window.innerWidth;
+    const top = saved.top * window.innerHeight;
+    const spot = clampPosition(left, top);
+    panel.style.left = spot.left + "px";
+    panel.style.top = spot.top + "px";
+    panel.style.right = "auto";
+  }
+
+  function makeDraggable(handle) {
+    let startX = 0;
+    let startY = 0;
+    let originLeft = 0;
+    let originTop = 0;
+    let dragging = false;
+
+    handle.addEventListener("pointerdown", (event) => {
+      // Buttons in the header (Close) must stay clickable.
+      if (event.target.closest("button")) return;
+      if (event.button !== 0) return;
+      dragging = true;
+      const box = panel.getBoundingClientRect();
+      originLeft = box.left;
+      originTop = box.top;
+      startX = event.clientX;
+      startY = event.clientY;
+      panel.style.right = "auto";
+      panel.style.left = originLeft + "px";
+      panel.style.top = originTop + "px";
+      handle.classList.add("tsn-dragging");
+      // Pointer capture keeps the drag alive even if the cursor leaves the
+      // header, which is what makes dragging feel correct rather than jumpy.
+      try {
+        handle.setPointerCapture(event.pointerId);
+      } catch {
+        /* capture is a nicety; the move handler still works without it */
+      }
+      event.preventDefault();
+    });
+
+    handle.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      const spot = clampPosition(originLeft + (event.clientX - startX), originTop + (event.clientY - startY));
+      panel.style.left = spot.left + "px";
+      panel.style.top = spot.top + "px";
+    });
+
+    const end = (event) => {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove("tsn-dragging");
+      try {
+        handle.releasePointerCapture(event.pointerId);
+      } catch {
+        /* already released */
+      }
+      const box = panel.getBoundingClientRect();
+      store.saveSettings({
+        panelPos: {
+          left: box.left / Math.max(1, window.innerWidth),
+          top: box.top / Math.max(1, window.innerHeight),
+        },
+      });
+    };
+
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
   }
 
   function saveFromInput(input) {
