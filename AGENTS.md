@@ -63,32 +63,35 @@ Shared guide: https://github.com/chirag127/userscript-install-guide — link it,
 ## Test
 `sctl install <raw url>`, open two tabs, use the menu to save a note, confirm the second tab
 receives it and that the first tab does not notify itself.
+
 <!-- okf-requirement -->
-## 🧠 OKF documentation requirement (mandatory)
+## 📚 Documentation lives in ONE place (mandatory)
 
-**Every repository in this collection MUST ship an Open Knowledge Format (OKF) bundle in `okf/`.**
-
-A repository without `okf/` is **incomplete**, even if the script works.
-
-### What must exist
+All documentation for every repository in this workspace is **single-sourced** in the
+umbrella repository:
 
 ```
-okf/
-├── bundle.md      overview of the collection
-├── index.md       catalogue of concepts
-├── concepts/      all shared concept notes
-└── scripts/       THIS repository's own script note (where one applies)
+c:\ws\docs\okf├── bundle.md            collection overview
+├── index.md             catalogue of every concept and script note
+├── concepts/            shared knowledge (architecture, testing, metadata, …)
+└── scripts/             one note per userscript repository
 ```
 
 ### Rules
 
-1. **Never hand-edit** a repository's `okf/` copy. The canonical bundle is
-   `repos/own/public/userscripts/okf/` in the `c:\ws` monorepo.
-2. After changing the canonical bundle, regenerate every copy:
-   `node okf/sync-okf.mjs`
-3. Verify nothing has drifted: `node okf/sync-okf.mjs --check` — must exit `0`.
-4. `README.md` must link to `okf/`. `AGENTS.md` (this file) must restate this requirement.
-5. When adding a new script, add its note at `okf/scripts/<repo-name>.md` in the canonical
-   bundle first, then sync.
+1. **Never create an `okf/` folder in this repository.** It is not duplicated here, by
+   design. There was once a copy in every repo: 278 files describing 42 unique documents,
+   with `concepts/architecture.md` physically present 32 times. Every edit had to be
+   propagated to 30 repositories and drift was unavoidable.
+2. **Never hand-edit a copy.** There are no copies. Edit the canonical file under
+   `c:\ws\docs\okf\`.
+3. **This repository's note is** `c:\ws\docs\okf\scripts\<repo-name>.md`. If it does not
+   exist, add it before adding the script.
+4. **Link, do not paste.** In `README.md`, link to the canonical note with a relative path
+   from the workspace, e.g. `[documentation](../../../../../docs/okf/scripts/<repo-name>.md)`.
+5. **Verify** with `node c:\ws\scripts\check-okf.mjs` — it exits `0` only when nothing is
+   duplicated and every repository is linked and documented.
+6. When adding a new script: create the repo, add `docs/okf/scripts/<repo-name>.md`, add it
+   to the tables in `docs/okf/bundle.md` and `docs/okf/index.md`, then run the checker.
 
-Full detail: [`okf/concepts/okf-requirement.md`](okf/concepts/okf-requirement.md)
+Full detail: `c:\ws\docs\okf\concepts\okf-requirement.md`.

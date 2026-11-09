@@ -35,18 +35,17 @@ Everything stays in your own browser profile, under the `tsn:` storage prefix. N
 
 ## License
 [MIT](LICENSE) © 2026 chirag127
-<!-- okf-bundle -->
-## 🧠 Knowledge bundle (OKF)
 
-This repository ships its documentation as an
-**Open Knowledge Format** bundle in `okf/` —
-written so both a human and an AI agent can understand the script without reading the code.
+<!-- docs-single-source -->
+## 📚 Documentation
 
-| File | Contents |
-|------|----------|
-| `okf/bundle.md` | Overview of the collection |
-| `okf/index.md` | Catalogue of concepts |
-| `okf/concepts/` | Shared knowledge (architecture, metadata, testing, ScriptCat/sctl notes) |
-| `okf/scripts/` | This script's own note (`x-tabsync-notes-userscript.md`) |
+Documentation for this repository lives in the umbrella workspace, in exactly **one** place:
 
-Regenerate every repository's copy from the canonical bundle with `node okf/sync-okf.mjs`.
+| What | Where |
+|------|-------|
+| This script's note | [`docs/okf/scripts/x-tabsync-notes-userscript.md`](../../../../../docs/okf/scripts/x-tabsync-notes-userscript.md) |
+| All notes, catalogued | [`docs/okf/index.md`](../../../../../docs/okf/index.md) |
+| Shared knowledge | [`docs/okf/concepts/`](../../../../../docs/okf/concepts/) |
+
+It is **not** copied into this repository. Nothing in this workspace is duplicated: one
+document, one file. Verify with `node c:\ws\scripts\check-okf.mjs`.
